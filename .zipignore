@@ -1,0 +1,6 @@
+.git*
+.vars
+.zipignore
+composer.*
+package.*
+tests/

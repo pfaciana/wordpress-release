@@ -1,0 +1,99 @@
+name: WordPress Release
+description: Creates a github release for a WordPress based on composer.json
+inputs:
+  main-file:
+    description: Relative path to the loader file
+    required: true
+  fallback-screenshot:
+    description: If a transparent screenshot should be created, if a screenshot is not found
+    required: false
+  zip-file:
+    description: Name of the zip file
+    required: false
+  zip-ignore:
+    description: location of the .zipignore file
+    required: false
+  release-tag:
+    description: Tag of the release
+    required: true
+  release-name:
+    description: Name of the release
+    required: false
+  release-body:
+    description: Body of the release
+    required: false
+  release-draft:
+    description: If the release is a draft
+    required: false
+  release-prerelease:
+    description: If the release is a prerelease
+    required: false
+  additional-files:
+    description: 'Additional files to include in the release (one file path per line)'
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - name: Dump github context
+      if: env.DEBUG_MODE == 1
+      run: echo "$GITHUB_CONTEXT"
+      shell: bash
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+
+    - name: Node, npm versions, and install
+      run: |
+        node --version
+        npm --version
+        npm install
+        rm package-lock.json
+      shell: bash
+      working-directory: ${{ github.action_path }}
+
+    - name: Setup PHP w/ Composer
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        tools: composer:v2
+
+    - name: PHP, composer Version and composer install & dump autoload
+      run: |
+        php -v
+        composer --version
+        composer install --no-dev --no-progress
+        composer dumpautoload -o
+      shell: bash
+
+    - name: Create WordPress loader file
+      id: create_loader
+      run: node ${{ env.DEBUG_MODE == '1' && '--inspect-brk=9229' || '' }} ${{ github.action_path }}/index.js
+      shell: bash
+      env:
+        MAIN_FILE: ${{ inputs.main-file }}
+        FALLBACK_SCREENSHOT: ${{ inputs.fallback-screenshot }}
+
+    - name: Zip Repo
+      run: |
+        zip -r ${{ inputs.zip-file || format('./{0}.zip', github.event.repository.name) }} . -x@${{ inputs.zip-ignore || format('{0}/.zipignore', github.action_path) }}
+      shell: bash
+
+    - name: Create Release w/ Asset
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: ${{ inputs.release-name || format('Release {0}', inputs.release-tag) }}
+        tag_name: ${{ inputs.release-tag }}
+        body: ${{ inputs.release-body || '' }}
+        draft: ${{ inputs.release-draft || false }}
+        prerelease: ${{ inputs.release-prerelease || false }}
+        files: |
+          ${{ inputs.zip-file || format('./{0}.zip', github.event.repository.name) }}
+          ${{ inputs.additional-files || '' }}
+
+    - name: Dump Release output
+      if: env.DEBUG_MODE == 1
+      run: echo "$RELEASE_OUTPUT"
+      shell: bash
+      env:
+        RELEASE_OUTPUT: ${{ toJson(steps.create_release.outputs) }}
