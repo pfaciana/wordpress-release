@@ -1,6 +1,6 @@
 {
 	"name": "wordpress-release",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "GitHub Action to create release for a WordPress plugin or theme",
 	"main": "index.js",
 	"author": "Phil Faciana <phil@renderdev.com> (https://renderdev.com/)",

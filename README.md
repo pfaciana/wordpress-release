@@ -22,8 +22,8 @@ Here's a minimal example to get you started:
 - name: WordPress Release
   uses: pfaciana/wordpress-release
   with:
-	main-file: index.php
-	release-tag: ${{ github.ref_name }}
+    main-file: index.php
+    release-tag: ${{ github.ref_name }}
 ```
 
 This basic configuration will create a release whenever a new tag starting with 'v' is pushed.
