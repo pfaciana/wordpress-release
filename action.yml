@@ -87,10 +87,6 @@ runs:
         
           # Use git archive to create the zip file
           git archive --format=zip HEAD -o ${{ inputs.zip-file || format('./{0}.zip', github.event.repository.name) }}
-                                          
-          # Reset repo and clean
-          git reset --hard HEAD~1
-          git clean -fd
         else
           # Use the zip command with the exclude file
           zip -r ${{ inputs.zip-file || format('./{0}.zip', github.event.repository.name) }} . -x@${{ inputs.zip-ignore || format('{0}/.zipignore', github.action_path) }}
@@ -109,6 +105,15 @@ runs:
         files: |
           ${{ inputs.zip-file || format('./{0}.zip', github.event.repository.name) }}
           ${{ inputs.additional-files || '' }}
+
+    - name: Zip Repo Cleanup
+      run: |
+        if [ "${{ inputs.zip-ignore }}" = ".gitattributes" ]; then
+          # Reset repo and clean
+          git reset --hard HEAD~1
+          git clean -fd
+        fi
+      shell: bash
 
     - name: Dump Release output
       if: env.DEBUG_MODE == 1
