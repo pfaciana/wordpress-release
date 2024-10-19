@@ -78,7 +78,7 @@ jobs:
 | main-file           | Relative path to the loader file                                    | Yes      | `index.php`                      |
 | fallback-screenshot | If a transparent screenshot should be created when not found        | No       | `false`                          |
 | zip-file            | Name of the `zip` file                                              | No       | `{repository-name}.zip`          |
-| zip-ignore          | Location of the `.zipignore` file                                   | No       | `.zipignore` in action directory |
+| zip-ignore          | Location of the zip exclude file                                    | No       | `.zipignore` in action directory |
 | release-tag         | Tag of the release                                                  | Yes      |                                  |
 | release-name        | Name of the release                                                 | No       | Release {release-tag}            |
 | release-body        | Body of the release                                                 | No       |                                  |
@@ -86,6 +86,8 @@ jobs:
 | release-prerelease  | If the release is a prerelease                                      | No       | `false`                          |
 | additional-files    | Additional files to include in the release (one file path per line) | No       |                                  |
 |                     |                                                                     |          |                                  |
+> The `zip-ignore` is a text file that gets passed to the `zip` command as an exclude file. If you have an `.gitattributes` file for your repo, you can pass that as the `zip-ignore` input, and a `git archive --format=zip` will get run in place of the `zip` command.
+
 > It should be noted that inputs like `release-tag`, `release-body`, `additional-files` should be dynamically created in steps prior to calling this action. That will be custom to your specific repo and not detailed in this doc.
 ### Outputs
 
@@ -117,6 +119,7 @@ jobs:
         with:
           main-file: 'style.css'
           fallback-screenshot: 'true'
+          zip-ignore: .gitattributes
           zip-file: 'my-custom-theme.zip'
           release-tag: ${{ github.ref_name }}
           release-name: 'Theme Update ${{ github.ref_name }}'

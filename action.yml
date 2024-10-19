@@ -75,7 +75,26 @@ runs:
 
     - name: Zip Repo
       run: |
-        zip -r ${{ inputs.zip-file || format('./{0}.zip', github.event.repository.name) }} . -x@${{ inputs.zip-ignore || format('{0}/.zipignore', github.action_path) }}
+        if [ "${{ inputs.zip-ignore }}" = ".gitattributes" ]; then
+          # Temporarily remove the .gitignore file
+          rm -f .gitignore || true
+        
+          # Temporarily commit unversioned files
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add -A
+          git commit -m "build commit for release" --no-verify || true
+        
+          # Use git archive to create the zip file
+          git archive --format=zip HEAD -o ${{ inputs.zip-file || format('./{0}.zip', github.event.repository.name) }}
+                                          
+          # Reset repo and clean
+          git reset --hard HEAD~1
+          git clean -fd
+        else
+          # Use the zip command with the exclude file
+          zip -r ${{ inputs.zip-file || format('./{0}.zip', github.event.repository.name) }} . -x@${{ inputs.zip-ignore || format('{0}/.zipignore', github.action_path) }}
+        fi
       shell: bash
 
     - name: Create Release w/ Asset
