@@ -4,6 +4,12 @@ inputs:
   main-file:
     description: Relative path to the loader file
     required: true
+  main-file-prepend:
+    description: content to prepend to the loader file
+    required: false
+  main-file-append:
+    description: content to append to the loader file
+    required: false
   fallback-screenshot:
     description: If a transparent screenshot should be created, if a screenshot is not found
     required: false
@@ -71,6 +77,8 @@ runs:
       shell: bash
       env:
         MAIN_FILE: ${{ inputs.main-file }}
+        MAIN_FILE_PREPEND: ${{ inputs.main-file-prepend }}
+        MAIN_FILE_APPEND: ${{ inputs.main-file-append }}
         FALLBACK_SCREENSHOT: ${{ inputs.fallback-screenshot }}
 
     - name: Zip Repo

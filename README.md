@@ -74,8 +74,10 @@ jobs:
 ### Inputs
 
 | Name                | Description                                                         | Required | Default                          |
-| ------------------- | ------------------------------------------------------------------- | -------- | -------------------------------- |
+|---------------------|---------------------------------------------------------------------|----------|----------------------------------|
 | main-file           | Relative path to the loader file                                    | Yes      | `index.php`                      |
+| main-file-prepend   | Content that will be prepended to the loader file                   | No       |                                  |
+| main-file-append    | Content that will be appended to the loader file                    | No       |                                  |
 | fallback-screenshot | If a transparent screenshot should be created when not found        | No       | `false`                          |
 | zip-file            | Name of the `zip` file                                              | No       | `{repository-name}.zip`          |
 | zip-ignore          | Location of the zip exclude file                                    | No       | `.zipignore` in action directory |
@@ -85,14 +87,15 @@ jobs:
 | release-draft       | If the release is a draft                                           | No       | `false`                          |
 | release-prerelease  | If the release is a prerelease                                      | No       | `false`                          |
 | additional-files    | Additional files to include in the release (one file path per line) | No       |                                  |
-|                     |                                                                     |          |                                  |
+
 > The `zip-ignore` is a text file that gets passed to the `zip` command as an exclude file. If you have an `.gitattributes` file for your repo, you can pass that as the `zip-ignore` input, and a `git archive --format=zip` will get run in place of the `zip` command.
 
 > It should be noted that inputs like `release-tag`, `release-body`, `additional-files` should be dynamically created in steps prior to calling this action. That will be custom to your specific repo and not detailed in this doc.
+
 ### Outputs
 
-| Name | Description |
-|------|-------------|
+| Name         | Description                                          |
+|--------------|------------------------------------------------------|
 | project-name | The name of the project extracted from composer.json |
 
 ## Examples
@@ -125,7 +128,7 @@ jobs:
           release-name: 'Theme Update ${{ github.ref_name }}'
           release-body: |
             Check out our latest theme update!
-            
+
             New features:
             - Improved responsiveness
             - New color schemes

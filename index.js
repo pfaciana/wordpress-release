@@ -60,7 +60,19 @@ async function run() {
 		content += ' */\n\n'
 
 		if (type === 'Plugin') {
+			if (composer?.extra?.['main-file-prepend']) {
+				content += composer.extra['main-file-prepend'] + `\n\n`
+			}
+			if (process.env.MAIN_FILE_PREPEND) {
+				content += process.env.MAIN_FILE_PREPEND + `\n\n`
+			}
 			content += `defined( 'ABSPATH' ) || exit;\n\nrequire __DIR__ . '/vendor/autoload.php';\n\n`
+			if (process.env.MAIN_FILE_APPEND) {
+				content += process.env.MAIN_FILE_APPEND + `\n\n`
+			}
+			if (composer?.extra?.['main-file-append']) {
+				content += composer.extra['main-file-append'] + `\n\n`
+			}
 		}
 
 		fs.writeFileSync(mainFile, content)
