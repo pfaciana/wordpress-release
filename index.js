@@ -61,6 +61,9 @@ async function run() {
 
 		if (type === 'Plugin') {
 			if (composer?.extra?.['main-file-prepend']) {
+				if (Array.isArray(composer.extra['main-file-prepend'])) {
+					composer.extra['main-file-prepend'] = composer.extra['main-file-prepend'].join('\n')
+				}
 				content += composer.extra['main-file-prepend'] + `\n\n`
 			}
 			if (process.env.MAIN_FILE_PREPEND) {
@@ -71,6 +74,9 @@ async function run() {
 				content += process.env.MAIN_FILE_APPEND + `\n\n`
 			}
 			if (composer?.extra?.['main-file-append']) {
+				if (Array.isArray(composer.extra['main-file-append'])) {
+					composer.extra['main-file-append'] = composer.extra['main-file-append'].join('\n')
+				}
 				content += composer.extra['main-file-append'] + `\n\n`
 			}
 		}
